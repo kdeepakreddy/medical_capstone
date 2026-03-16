@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title class="notranslate">MedAI Analyzer</title>
+    
+    <link rel="icon" id="custom-favicon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNTYgMjU2IiBmaWxsPSIjNGY0NmU1Ij48cGF0aCBkPSJNMjQwLDEwMmMwLDcwLTEwMy43OSwxMjYuNjYtMTA4LjIxLDEyOWE4LDgsMCwwLDEtNy41OCwwQzExOS43OSwyMjguNjYsMTYsMTcyLDE2LDEwMkE2Mi4wNyw2Mi4wNywwLDAsMSw3OCw0MGMyMC42NSwwLDM4LjczLDguODgsNTAsMjMuODlDMTM5LjI3LDQ4Ljg4LDE1Ny4zNSw0MCwxNzgsNDBBNjIuMDcsNjIuMDcsMCwwLDEsMjQwLDEwMlptLTkyLjQtNy41MWE4LDgsMCwwLDAtMTMuODgsM0wxMjEuMjgsMTQxLDEwNy41NCw5NS4yYTgsOCwwLDAsMC0xNC45My0xLjZMNzIuMjYsMTMySDQwYTgsOCwwLDAsMCwwLDE2SDc3Ljc0YTgsOCwwLDAsMCw3LjExLTQuNDZsMTMtMjYsMTQuNjEsNDguNzRhOCw4LDAsMCwwLDE1LjEsMWwxMy00OC42NSw1Ljg0LDE1LjU4QTgsOCwwLDAsMCwxNTQsMTQwaDYyYTgsOCwwLDAsMCwwLTE2SDE1OS42MVoiLz48L3N2Zz4=">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="styles.css">
+    
+    <style>
+        html { margin-top: 0 !important; top: 0 !important; }
+        body { margin-top: 0 !important; top: 0px !important; position: static !important; }
+        #google_translate_element, .skiptranslate, .goog-te-banner-frame { 
+            display: none !important; 
+            width: 0 !important;
+            height: 0 !important;
+        }
+
+        .custom-lang-dropdown {
+            position: relative;
+            background-color: var(--surface);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            user-select: none;
+            min-width: 150px;
+            transition: all 0.2s ease;
+        }
+
+        .custom-lang-dropdown:hover {
+            border-color: var(--primary);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .dropdown-selected {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0 1rem;
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.875rem;
+            font-weight: 500;
+            height: 42px; 
+            box-sizing: border-box;
+        }
+
+        .dropdown-selected i.ph-globe {
+            color: var(--primary);
+            font-size: 1.25rem;
+        }
+
+        .dropdown-selected i.ph-caret-down {
+            margin-left: auto;
+            color: var(--text-tertiary);
+            transition: transform 0.2s ease;
+        }
+
+        .dropdown-options {
+            position: absolute;
+            top: calc(100% + 5px);
+            left: 0;
+            right: 0;
+            background-color: var(--surface);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-lg);
+            display: none; 
+            flex-direction: column;
+            z-index: 100;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .dropdown-options::-webkit-scrollbar { width: 4px; }
+        .dropdown-options::-webkit-scrollbar-track { background: transparent; }
+        .dropdown-options::-webkit-scrollbar-thumb { background: var(--border-focus); border-radius: 4px; }
+
+        .custom-lang-dropdown.open .dropdown-options {
+            display: flex;
+        }
+
+        .custom-lang-dropdown.open .dropdown-selected i.ph-caret-down {
+            transform: rotate(180deg);
+        }
+
+        .lang-option {
+            padding: 0.75rem 1rem;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            font-family: 'Inter', sans-serif;
+            transition: background 0.2s;
+        }
+
+        .lang-option:hover {
+            background-color: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .lang-option.active {
+            background-color: var(--primary-light);
+            color: var(--primary);
+            font-weight: 600;
+            border-left: 3px solid var(--primary);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo notranslate" translate="no">
+                <i class="ph-fill ph-heartbeat"></i>
+                <span>MedAI <strong>Analyzer</strong></span>
+            </div>
+            
+            <div class="custom-lang-dropdown notranslate" translate="no" id="custom-lang-dropdown">
+                <div class="dropdown-selected" id="dropdown-selected">
+                    <i class="ph ph-globe"></i>
+                    <span id="selected-lang-text">English</span>
+                    <i class="ph-bold ph-caret-down"></i>
+                </div>
+                <div class="dropdown-options" id="dropdown-options">
+                    <div class="lang-option active" data-lang="en">English</div>
+                    <div class="lang-option" data-lang="bn">Bengali</div>
+                    <div class="lang-option" data-lang="gu">Gujarati</div>
+                    <div class="lang-option" data-lang="hi">Hindi</div>
+                    <div class="lang-option" data-lang="kn">Kannada</div>
+                    <div class="lang-option" data-lang="ml">Malayalam</div>
+                    <div class="lang-option" data-lang="mr">Marathi</div>
+                    <div class="lang-option" data-lang="or">Odia (Oriya)</div>
+                    <div class="lang-option" data-lang="pa">Punjabi</div>
+                    <div class="lang-option" data-lang="ta">Tamil</div>
+                    <div class="lang-option" data-lang="te">Telugu</div>
+                    <div class="lang-option" data-lang="ur">Urdu</div>
+                </div>
+            </div>
+            
+        </div>
+    </nav>
+    
+    <main class="container">
+       <section class="hero-section">
+            <h1>Understand Your Medical Reports</h1>
+            <p>Upload your doctor's notes, lab tests, or hospital papers. Our AI finds the hard medical terms and explains them in simple language.</p>
+            
+            <div class="upload-card">
+                <div class="drop-zone" id="drop-zone">
+                    <input type="file" id="file-input" accept=".pdf, .png, .jpg, .jpeg, .txt" hidden>
+                    <div class="drop-zone-content">
+                        <div class="icon-container">
+                            <i class="ph ph-upload-simple"></i>
+                        </div>
+                        <h3>Upload your report</h3>
+                        <p>Drag and drop your file here, or <span class="browse-link">browse</span></p>
+                        <span class="file-types">Supports PDF, PNG, JPG, TXT</span>
+                    </div>
+                </div>
+                <div id="file-preview" class="file-preview hidden">
+                    <div class="file-info">
+                        <i id="file-icon" class="ph-fill ph-file-pdf"></i>
+                        <div class="file-details">
+                            <span id="file-name" class="file-name">report.pdf</span>
+                            <span id="file-size" class="file-size">2.4 MB</span>
+                        </div>
+                    </div>
+                    <button class="remove-file" id="remove-file" title="Remove file">
+                        <i class="ph-bold ph-x"></i>
+                    </button>
+                </div>
+                <button id="analyze-btn" class="primary-btn" disabled>
+                    <i class="ph-bold ph-sparkle"></i>
+                    Analyze Report
+                </button>
+            </div>
+        </section>
+
+        <section id="loading-state" class="loading-state hidden">
+            <div class="heartbeat-loader">
+                <svg viewBox="0 0 100 50" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M 0,25 L 20,25 L 25,10 L 35,45 L 45,5 L 55,35 L 60,25 L 100,25" />
+                </svg>
+            </div>
+            <h2>AI is analyzing your document...</h2>
+            <p>Extracting entities, analyzing context, and generating clear, simple summaries.</p>
+        </section>
+
+        <section id="results-section" class="results-section hidden">
+            <div class="results-header">
+                <h2>Analysis Complete</h2>
+                <button id="new-analysis-btn" class="secondary-btn">
+                    <i class="ph ph-arrow-counter-clockwise"></i> Start New
+                </button>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="panel metrics-panel">
+                    <div class="panel-header">
+                        <i class="ph-fill ph-chart-pie-slice"></i>
+                        <h3>Health Severity Index</h3>
+                    </div>
+                    <div class="panel-body metrics-body">
+                        <div class="chart-container">
+                            <canvas id="severityChart"></canvas>
+                            <div class="chart-center-text" id="severity-text">Normal</div>
+                        </div>
+                        
+                        <div class="confidence-container">
+                            <div class="confidence-header">
+                                <h4>AI Confidence Score</h4>
+                                <span id="confidence-text">0%</span>
+                            </div>
+                            <div class="progress-bar-bg">
+                                <div class="progress-bar-fill" id="confidence-fill"></div>
+                            </div>
+                            <p class="confidence-subtext">Accuracy of extracted findings based on text clarity</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="panel insights-panel">
+                    <div class="panel-header">
+                        <i class="ph-fill ph-lightbulb"></i>
+                        <h3>AI Insights & Explanations</h3>
+                    </div>
+                    <div class="panel-body scroll-y" id="insights-container">
+                        <div id="overall-assessment-container"></div>
+                        <div class="terms-divider hidden" id="terms-divider">
+                            <span>Key Terms Identified</span>
+                        </div>
+                        <div id="explanations-list" class="explanations-list"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="app.js"></script>
+    
+    <div id="google_translate_element"></div>
+
+    <script type="text/javascript">
+        const protectFavicon = new MutationObserver(() => {
+            const injectedFavicons = document.querySelectorAll('link[rel="icon"], link[rel="shortcut icon"]');
+            injectedFavicons.forEach(favicon => {
+                if (favicon.id !== 'custom-favicon') {
+                    favicon.remove();
+                }
+            });
+        });
+        protectFavicon.observe(document.head, { childList: true });
+
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({
+                pageLanguage: 'en',
+                includedLanguages: 'en,hi,te,ta,kn,ml,mr,gu,bn,pa,ur,or',
+                autoDisplay: false
+            }, 'google_translate_element');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const dropdown = document.getElementById('custom-lang-dropdown');
+            const selectedText = document.getElementById('selected-lang-text');
+            const options = document.querySelectorAll('.lang-option');
+            
+            dropdown.addEventListener('click', (e) => {
+                dropdown.classList.toggle('open');
+                e.stopPropagation();
+            });
+
+            document.addEventListener('click', () => {
+                dropdown.classList.remove('open');
+            });
+
+            options.forEach(option => {
+                option.addEventListener('click', (e) => {
+                    const langCode = option.getAttribute('data-lang');
+                    const langName = option.innerText;
+                    
+                    selectedText.innerText = langName;
+                    options.forEach(opt => opt.classList.remove('active'));
+                    option.classList.add('active');
+                    
+                    const googleSelect = document.querySelector('.goog-te-combo');
+                    if (googleSelect) {
+                        googleSelect.value = langCode;
+                        googleSelect.dispatchEvent(new Event('change'));
+                    }
+                });
+            });
+        });
+    </script>
+    <script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</body>
+</html>
