@@ -20,12 +20,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-MODEL_PATH = "./custom_ner_model_final"
+MODEL_PATH = "Kdeepakreddy/medai-ner" 
+
 tokenizer = AutoTokenizer.from_pretrained(MODEL_PATH)
 model = AutoModelForTokenClassification.from_pretrained(MODEL_PATH)
 ner_pipeline = pipeline("ner", model=model, tokenizer=tokenizer, aggregation_strategy="simple")
 
-GROQ_API_KEY = "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"
+GROQ_API_KEY = os.getenv("GROQ_API_KEY") 
 client = Groq(api_key=GROQ_API_KEY)
 
 def extract_text_from_file(file_content, filename):
