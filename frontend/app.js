@@ -161,7 +161,7 @@ document.addEventListener('DOMContentLoaded', () => {
         formData.append('file', selectedFile);
 
         try {
-            const response = await fetch('https://kdeepakreddy-medai-backend.hf.space/analyze', {
+            const response = await fetch('https://kdeepakreddy-medai-backend-v2.hf.space/analyze', {
                 method: 'POST',
                 body: formData
             });
