@@ -49,9 +49,9 @@ Our custom Named Entity Recognition (NER) model was rigorously evaluated using t
 * Node.js & npm
 * Tesseract OCR & Poppler installed on your local machine
 * A Groq API Key
-  
+
 ### 1. Backend Setup
-```bash
+`bash
 # Navigate to the backend directory
 cd backend
 
@@ -67,9 +67,10 @@ export GROQ_API_KEY="your_api_key_here"  # On Windows use `set GROQ_API_KEY=your
 
 # Start the FastAPI server
 uvicorn main:app --reload
+`
 
 ### 2. Frontend Setup
-```bash
+`bash
 # Navigate to the frontend directory
 cd frontend
 
@@ -78,3 +79,8 @@ npm install
 
 # Start the React development server
 npm start
+`
+*Note: Ensure your frontend `.env` file points to the local FastAPI server URL (usually `http://localhost:8000`).*
+
+## ⚙️ System Architecture
+The application utilizes a strict decoupled architecture. The React frontend handles user interactions and file uploads, sending data via HTTP POST `fetch()` requests to the FastAPI backend. The backend manages all heavy C++ dependencies (OCR) and high-RAM Machine Learning tasks, returning a structured JSON payload to the frontend for dynamic display.
